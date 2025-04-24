@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import fs from 'fs';
-import path from 'path';
 
 function getCurrentDomain(req: NextRequest): string {
     const host = req.headers.get('host');
@@ -13,26 +11,23 @@ function getCurrentDomain(req: NextRequest): string {
 }
 
 const generateShortUrl = (platformAbbreviation: string, projectCode: string, currentDomain: string): string => {
-    return `${currentDomain}/go?p=${encodeURIComponent(platformAbbreviation)}&c=${encodeURIComponent(projectCode)}`;
+    return `${currentDomain}/${platformAbbreviation}/${projectCode}`;
 };
 
-const generateLongUrl = (sourceTypeEn: string, abbreviation: string, projectCode: string): string => {
-    return `https://cloud.fastgpt.cn/login?lastRoute=%2Fapp%2Flist&utm_source=${sourceTypeEn}&utm_medium=${abbreviation}&utm_content=${projectCode}`;
-};
-
-const createFolder = (platform: string, projectCode: string): string => {
-    const folderPath = path.join('data', 'users', platform, projectCode);
-    if (!fs.existsSync(folderPath)) {
-        fs.mkdirSync(folderPath, { recursive: true });
+const generateLongUrl = (sourceTypeEn: string, abbreviation: string, projectCode: string, workflow_url: string): string => {
+    // 如果workflow_url为空，不添加utm_workflow参数
+    if (workflow_url===null) {
+        return `https://cloud.fastgpt.cn/login?lastRoute=%2Fapp%2Flist&utm_source=${sourceTypeEn}&utm_medium=${abbreviation}&utm_content=${projectCode}`;
     }
-    return folderPath;
+    // 否则包含utm_workflow参数
+    return `https://cloud.fastgpt.cn/login?lastRoute=%2Fapp%2Flist&utm_source=${sourceTypeEn}&utm_medium=${abbreviation}&utm_content=${projectCode}&utm_workflow=${workflow_url}`;
 };
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const currentDomain = getCurrentDomain(request);
-        const { sourceType, platform, projectCode, description } = body;
+        const { sourceType, platform, projectCode, workflow_url } = body;
 
         // 参数验证
         if (!sourceType || !platform || !projectCode) {
@@ -64,8 +59,8 @@ export async function POST(request: NextRequest) {
             ? sourceTypeData[0].en
             : sourceType;
 
-        const shortUrl = generateShortUrl(platform, projectCode, currentDomain);
-        const longUrl = generateLongUrl(sourceTypeEn, platformAbbreviation, projectCode);
+        const shortUrl = generateShortUrl(platformAbbreviation, projectCode, currentDomain);
+        const longUrl = generateLongUrl(sourceTypeEn, platformAbbreviation, projectCode, workflow_url);
 
         // 使用当前时间
         const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -73,9 +68,9 @@ export async function POST(request: NextRequest) {
         // 创建数据库记录 - 使用link_info表并明确指定created_at和description
         await query(
             `INSERT INTO link_info (
-                source_type, platform, project_code, description, short_url, long_url, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [sourceType, platform, projectCode, description || '', shortUrl, longUrl, currentTime]
+                source_type, platform, project_code, short_url, long_url, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?)`,
+            [sourceType, platform, projectCode, shortUrl, longUrl, currentTime]
         );
 
         // 获取最后插入的记录ID
@@ -89,7 +84,6 @@ export async function POST(request: NextRequest) {
             sourceType,
             platform,
             projectCode,
-            description: description || '',
             shortUrl,
             longUrl
         });

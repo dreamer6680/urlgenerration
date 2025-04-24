@@ -29,7 +29,24 @@ const HomePage: React.FC = () => {
         };
         fetchLinks();
     }, []);
-
+    
+        // 获取链接列表
+        // useEffect(() => {
+        //     const fetchLinks = async () => {
+        //         try {
+        //             setLoading(true);
+        //             const response = await axios.get<LinkInfo[]>('/api/links');
+        //             setLinks(response.data);
+        //             setError('');
+        //         } catch (error) {
+        //             console.error('获取链接失败:', error);
+        //             setError('获取链接失败，请稍后重试');
+        //         } finally {
+        //             setLoading(false);
+        //         }
+        //     };
+        //     fetchLinks();
+        // }, []);
     const handleGenerateLink = async () => {
         try {
             const response = await axios.post<LinkInfo>('/api/generate', {

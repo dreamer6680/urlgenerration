@@ -9,12 +9,12 @@ export async function GET() {
         id,
         DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as createdAt,
         source_type as sourceType,
-        platform,
+        platform_name as platform,
         project_code as projectCode,
         description,
         short_url as shortUrl,
         long_url as longUrl
-      FROM link_info 
+      FROM link_workflow_info
       ORDER BY created_at DESC
     `) as any[];
     

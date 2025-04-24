@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       console.log(`SQL参数: platform=${platform}, projectCode=${projectCode}`);
       
       const rows = await query(
-        'SELECT long_url as longUrl FROM link_info WHERE platform = ? AND project_code = ? LIMIT 1',
+        'SELECT long_url as longUrl FROM platformmatch WHERE abbreviation = ? AND project_code = ? LIMIT 1',
         [platform, projectCode]
       ) as any[];
 
