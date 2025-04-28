@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
-import { withAuth } from '@/lib/apiAuth';
+import { query } from '../../../lib/db';
+import { withAuth } from '../../../lib/apiAuth';
 import { NextRequest } from 'next/server';
 
 // 处理POST请求 - 创建新项目
@@ -30,26 +30,50 @@ export const POST = async (req: NextRequest) => {
         );
       }
 
-      // 验证workflow是有效的JSON（如果提供了workflow）
+      // 验证workflow是有效的JSON（无论如何都验证，只要不是null或undefined）
+      let validatedWorkflow = null;
+      
       if (workflow !== null && workflow !== undefined) {
-        // 如果workflow已经是对象（前端可能已经解析过），那么无需额外验证
         // 如果是字符串，则尝试解析确认是有效的JSON
         if (typeof workflow === 'string') {
+          // 空字符串也要验证
+          if (workflow.trim() === '') {
+            return NextResponse.json(
+              { success: false, message: 'Workflow不能为空字符串' },
+              { status: 400 }
+            );
+          }
+          
           try {
-            JSON.parse(workflow);
+            validatedWorkflow = JSON.parse(workflow);
           } catch (e) {
             return NextResponse.json(
               { success: false, message: 'Workflow必须是有效的JSON格式' },
               { status: 400 }
             );
           }
+        } else if (typeof workflow === 'object') {
+          // 如果是对象，检查是否为空对象
+          if (Object.keys(workflow).length === 0) {
+            return NextResponse.json(
+              { success: false, message: 'Workflow不能为空对象' },
+              { status: 400 }
+            );
+          }
+          validatedWorkflow = workflow;
+        } else {
+          // 既不是字符串也不是对象，则不是有效的JSON
+          return NextResponse.json(
+            { success: false, message: 'Workflow必须是有效的JSON格式或对象' },
+            { status: 400 }
+          );
         }
       }
 
       // 生成URL
       const host = req.headers.get('host') || 'localhost:3000';
       const protocol = host.includes('localhost') ? 'http' : 'https';
-      const url = workflow ? `${protocol}://${host}/api/json/${projectCode}` : null;
+      const url = validatedWorkflow ? `${protocol}://${host}/api/json/${projectCode}` : null;
 
       // description可为空，转换为null避免空字符串问题
       const finalDescription = projectDescription && projectDescription.trim() ? projectDescription : null;
@@ -57,7 +81,7 @@ export const POST = async (req: NextRequest) => {
       // 保存到数据库
       await query(
         'INSERT INTO workflow (project_code, description, url, workflow) VALUES (?, ?, ?, ?)',
-        [projectCode, finalDescription, url, workflow ? JSON.stringify(workflow) : null]
+        [projectCode, finalDescription, url, validatedWorkflow ? JSON.stringify(validatedWorkflow) : null]
       );
 
       return NextResponse.json({

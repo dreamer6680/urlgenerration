@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from './lib/auth';
 
 // 不需要登录即可访问的路径
-const publicPaths = ['/login', '/api/login', '/api/user'];
+const publicPaths = ['/login', '/api/login', '/api/user', '/socket.io'];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  
+  console.log(`[中间件] 处理路径: ${path}`);
   
   // 跳过API路由、静态资源和主页
   if (
@@ -15,8 +17,10 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/public') || 
     path === '/' ||
     path.startsWith('/login') ||
-    path.startsWith('/json') // 添加对/json路径的处理，直接通过
+    path.startsWith('/json') || // 添加对/json路径的处理，直接通过
+    path.startsWith('/socket.io') // 允许Socket.io连接
   ) {
+    console.log(`[中间件] 跳过处理: ${path}`);
     return NextResponse.next();
   }
   
@@ -28,11 +32,12 @@ export async function middleware(request: NextRequest) {
     
     console.log(`[中间件] 检测到短链格式: ${platform}/${projectCode}`);
     
-    // 构建重定向URL，使用projectCode参数名
-    const redirectUrl = new URL(`/api/redirect?platform=${encodeURIComponent(platform)}&projectCode=${encodeURIComponent(projectCode)}&direct=true`, request.url);
+    // 构建到API路由的URL
+    const redirectApiUrl = new URL(`/api/redirect?platform=${encodeURIComponent(platform)}&projectCode=${encodeURIComponent(projectCode)}`, request.url);
+    console.log(`[中间件] 重定向到API路由: ${redirectApiUrl.toString()}`);
     
-    // 重定向到API路由
-    return NextResponse.redirect(redirectUrl);
+    // 重定向到API路由处理
+    return NextResponse.redirect(redirectApiUrl);
   }
   
   // 获取当前用户 - 添加await
@@ -46,7 +51,7 @@ export async function middleware(request: NextRequest) {
   }
   
   // 如果用户未登录且试图访问需要认证的页面，重定向到登录页
-  if (!user && !path.startsWith('/login')) {
+  if (!user && !publicPaths.includes(path)) {
     console.log('[中间件] 未登录用户访问受保护页面，重定向到登录页');
     const loginUrl = new URL('/login', request.url);
     // 保存原始URL，登录成功后可以重定向回来

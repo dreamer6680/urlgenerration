@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/apiAuth';
+import { withAuth } from '../../../lib/apiAuth';
 
 // 受保护的GET API
 export async function GET(request: NextRequest) {

@@ -135,5 +135,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
         </form>
       </div>
     </div>
+
+    
   );
 } 

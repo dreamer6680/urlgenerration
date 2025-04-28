@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useCurrentUser } from '@/lib/authClient';
-import { useRouter } from 'next/navigation';
+import { useCurrentUser } from '../lib/authClient';
 import AddProjectModal from './components/AddProjectModal';
 import AddPlatformModal from './components/AddPlatformModal';
 import AddSourceTypeModal from './components/AddSourceTypeModal';

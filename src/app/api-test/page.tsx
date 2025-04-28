@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentUser, callProtectedApi } from '@/lib/authClient';
+import { useCurrentUser, callProtectedApi } from '../../lib/authClient';
 
 export default function ApiTestPage() {
   const { user, loading } = useCurrentUser();

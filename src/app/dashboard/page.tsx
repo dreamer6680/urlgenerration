@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/lib/authClient';
+import { useCurrentUser } from '../../lib/authClient';
 
 // 仪表盘页面 - 受保护的路由
 export default function DashboardPage() {

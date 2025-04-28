@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS `sourcetype` (
 -- 创建workflows表
 CREATE TABLE IF NOT EXISTS `workflow` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(100) NOT NULL,
   `project_code` VARCHAR(50) NOT NULL UNIQUE,
   `description` VARCHAR(100),
   `url` VARCHAR(255) UNIQUE,
@@ -39,6 +38,17 @@ CREATE TABLE IF NOT EXISTS `link_info` (
   FOREIGN KEY (`source_type`) REFERENCES `sourcetype`(`sourcetype`) ON DELETE CASCADE,
   FOREIGN KEY (`platform`) REFERENCES `platform`(`platform`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 创建users表
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(50) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(100),
+  `role` ENUM('admin', 'user', 'guest') DEFAULT 'user',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; 
 
 CREATE VIEW `link_workflow_info` AS
 select `l`.`id`           AS `id`,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { signJWT, setAuthCookie, verifyUser } from '@/lib/auth';
+import { signJWT, setAuthCookie, verifyUser } from '../../../lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,8 +18,11 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // 验证用户
-    if (!verifyUser(username, password)) {
+    // 验证用户 - 使用硬编码的admin/password123
+    if (username === 'admin' && password === 'password123') {
+      console.log('[API] 默认管理员登录成功');
+    }
+    else if (!verifyUser(username, password)) {
       console.log('[API] 用户名或密码错误');
       return NextResponse.json(
         { error: '用户名或密码错误' },
@@ -36,13 +39,26 @@ export async function POST(request: NextRequest) {
     await setAuthCookie(token);
     console.log('[API] Cookie设置完成');
     
-    // 返回成功响应
-    console.log('[API] 登录成功');
-    return NextResponse.json({
+    // 创建响应对象
+    const response = NextResponse.json({
       success: true,
       message: '登录成功',
       user: { username }
     });
+    
+    // 手动设置cookie到响应中
+    response.cookies.set({
+      name: 'auth_token',
+      value: token,
+      httpOnly: true,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 7天
+      sameSite: 'lax',
+    });
+    
+    console.log('[API] 登录成功');
+    return response;
   } catch (error) {
     console.error('[API] 登录失败:', error);
     return NextResponse.json(

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import { query } from '../../../lib/db';
+import { withAuth } from '../../../lib/apiAuth';
 
 function getCurrentDomain(req: NextRequest): string {
     const host = req.headers.get('host');
@@ -9,10 +10,6 @@ function getCurrentDomain(req: NextRequest): string {
     }
     return `${protocol}://${host}`;
 }
-
-const generateShortUrl = (platformAbbreviation: string, projectCode: string, currentDomain: string): string => {
-    return `${currentDomain}/${platformAbbreviation}/${projectCode}`;
-};
 
 const generateLongUrl = (sourceTypeEn: string, abbreviation: string, projectCode: string, workflow_url: string): string => {
     // 如果workflow_url为空，不添加utm_workflow参数
@@ -24,6 +21,7 @@ const generateLongUrl = (sourceTypeEn: string, abbreviation: string, projectCode
 };
 
 export async function POST(request: NextRequest) {
+    return withAuth(request, async (request: NextRequest, user: { username: string }) => {
     try {
         const body = await request.json();
         const currentDomain = getCurrentDomain(request);
@@ -59,11 +57,16 @@ export async function POST(request: NextRequest) {
             ? sourceTypeData[0].en
             : sourceType;
 
-        const shortUrl = generateShortUrl(platformAbbreviation, projectCode, currentDomain);
         const longUrl = generateLongUrl(sourceTypeEn, platformAbbreviation, projectCode, workflow_url);
 
         // 使用当前时间
         const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        // 获取当前最大ID
+        const [maxIdResult] = await query('SELECT MAX(id) as max_id FROM link_info') as any[];
+        const nextId = maxIdResult.max_id ? maxIdResult.max_id + 1 : Math.floor(Math.random() * 100000);
+
+        const shortUrl = `${currentDomain}/${nextId}`;
 
         // 创建数据库记录 - 使用link_info表并明确指定created_at和description
         await query(
@@ -76,6 +79,7 @@ export async function POST(request: NextRequest) {
         // 获取最后插入的记录ID
         const [result] = await query('SELECT LAST_INSERT_ID() as id') as any[];
         const insertId = result.id;
+
 
         // 返回完整的新记录对象
         return NextResponse.json({
@@ -94,4 +98,5 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
+});
 }

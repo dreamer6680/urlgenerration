@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { login, useCurrentUser } from '@/lib/authClient';
+import { login, useCurrentUser } from '../../lib/authClient';
 
-export default function LoginPage() {
+// 用于Suspense加载状态的组件
+function LoginLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-xl text-gray-600">加载中...</div>
+    </div>
+  );
+}
+
+// 登录表单组件
+function LoginForm() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -13,7 +23,7 @@ export default function LoginPage() {
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fromUrl = searchParams.get('from') || '/';
+  const fromUrl = searchParams?.get('from') || '/';
   
   // 检查用户是否已登录
   const { user, loading: userLoading, refreshUser } = useCurrentUser();
@@ -24,13 +34,19 @@ export default function LoginPage() {
       console.log('[登录页] 登录成功，跳转到:', fromUrl);
       
       // 使用setTimeout确保浏览器有时间处理cookie
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         console.log('[登录页] 执行跳转');
-        // 使用window.location.href强制页面跳转
-        window.location.href = fromUrl;
+        // 优先使用Router API，降级到window.location
+        try {
+          router.push(fromUrl);
+        } catch (e) {
+          window.location.href = fromUrl;
+        }
       }, 1000);
+      
+      return () => clearTimeout(timer);
     }
-  }, [user, userLoading, loginSuccess, fromUrl]);
+  }, [user, userLoading, loginSuccess, fromUrl, router]);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,12 +74,6 @@ export default function LoginPage() {
         
         // 刷新用户状态
         await refreshUser();
-        
-        // 延迟跳转，确保cookie已设置
-        setTimeout(() => {
-          console.log('[登录页] 执行延迟跳转');
-          window.location.href = fromUrl;
-        }, 1000);
       } else {
         // 登录失败但返回了成功状态
         console.log('[登录页] 登录API返回成功状态但可能有问题');
@@ -149,12 +159,17 @@ export default function LoginPage() {
               {loading ? '登录中...' : loginSuccess ? '登录成功' : '登录'}
             </button>
           </div>
-          
-          <div className="text-center text-sm text-gray-500">
-            <p>提示: 默认用户名 admin，密码 password123</p>
-          </div>
         </form>
       </div>
     </div>
+  );
+}
+
+// 主页面组件，使用Suspense包装
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoader />}>
+      <LoginForm />
+    </Suspense>
   );
 } 
