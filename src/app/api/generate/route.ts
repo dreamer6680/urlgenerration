@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         await query(
             `INSERT INTO link_info (
                 source_type, platform, project_code, short_url, long_url, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?);`,
             [sourceType, platform, projectCode, shortUrl, longUrl, currentTime]
         );
 
