@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
-import { withAuth } from '../../../lib/apiAuth';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  return withAuth(req, async (req: NextRequest, user: { username: string }) => {
-    try {
-      // 查询链接列表
+  try {
+    // 查询链接列表
     const links = await query(`
       SELECT 
         id,
@@ -29,5 +27,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-});
-} 
+}

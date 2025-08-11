@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
-import { withAuth } from '../../../lib/apiAuth';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  return withAuth(req, async (req: NextRequest, user: { username: string }) => {
-    try {
-      // 查询来源类型列表
-      const sourceTypes = await query('SELECT * FROM sourcetype ORDER BY id ASC') as any[];
-      
+  try {
+    // 查询来源类型列表
+    const sourceTypes = await query('SELECT * FROM sourcetype ORDER BY id ASC') as any[];
+    
     return NextResponse.json(sourceTypes);
   } catch (error) {
     console.error('获取来源类型列表失败:', error);
@@ -17,15 +15,13 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-});
 }
 
 // 添加新来源类型的API
 export async function POST(request: NextRequest) {
-  return withAuth(request, async (request: NextRequest, user: { username: string }) => {
-    try {
-      const body = await request.json();
-      const { sourcetype, en } = body;
+  try {
+    const body = await request.json();
+    const { sourcetype, en } = body;
 
     // 验证参数
     if (!sourcetype || !en) {
@@ -71,5 +67,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-});
-} 
+}

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
-import { withAuth } from '../../../lib/apiAuth';
 
 function getCurrentDomain(req: NextRequest): string {
     const host = req.headers.get('host');
@@ -21,7 +20,6 @@ const generateLongUrl = (sourceTypeEn: string, abbreviation: string, projectCode
 };
 
 export async function POST(request: NextRequest) {
-    return withAuth(request, async (request: NextRequest, user: { username: string }) => {
     try {
         const body = await request.json();
         const currentDomain = getCurrentDomain(request);
@@ -122,5 +120,4 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
-});
 }

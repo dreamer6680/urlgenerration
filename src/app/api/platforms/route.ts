@@ -1,31 +1,27 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
-import { withAuth } from '../../../lib/apiAuth';
 import { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  return withAuth(req, async (req: NextRequest, user: { username: string }) => {
-    try {
-      // 查询平台列表
-      const platforms = await query('SELECT * FROM platform ORDER BY id ASC') as any[];
-      
-      return NextResponse.json(platforms);
-    } catch (error) {
-      console.error('获取平台列表失败:', error);
-      return NextResponse.json(
-        { error: '获取平台列表失败' },
-        { status: 500 }
-      );
-    }
-  });
+  try {
+    // 查询平台列表
+    const platforms = await query('SELECT * FROM platform ORDER BY id ASC') as any[];
+    
+    return NextResponse.json(platforms);
+  } catch (error) {
+    console.error('获取平台列表失败:', error);
+    return NextResponse.json(
+      { error: '获取平台列表失败' },
+      { status: 500 }
+    );
+  }
 }
 
 // 添加新平台的API
 export async function POST(request: NextRequest) {
-  return withAuth(request, async (request: NextRequest, user: { username: string }) => {
-    try {
-      const body = await request.json();
-      const { platform, abbreviation } = body;
+  try {
+    const body = await request.json();
+    const { platform, abbreviation } = body;
 
     // 验证参数
     if (!platform || !abbreviation) {
@@ -71,5 +67,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-});
-} 
+}

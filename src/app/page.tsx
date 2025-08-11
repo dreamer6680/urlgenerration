@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useCurrentUser } from '../lib/authClient';
 import AddProjectModal from './components/AddProjectModal';
 import AddPlatformModal from './components/AddPlatformModal';
 import AddSourceTypeModal from './components/AddSourceTypeModal';
@@ -69,9 +68,6 @@ const HomePage: React.FC = () => {
     const [newSourceTypeEn, setNewSourceTypeEn] = useState<string>('');
     const [addingSourceType, setAddingSourceType] = useState<boolean>(false);
     const [addSourceTypeError, setAddSourceTypeError] = useState<string>('');
-
-    // 使用客户端认证hook
-    const { user, loading: authLoading } = useCurrentUser();
 
     // 在组件加载时加载项目列表
     const [showAddProjectModal, setShowAddProjectModal] = useState(false);
@@ -172,6 +168,8 @@ const HomePage: React.FC = () => {
                 workflow_url: project.url
             });
             
+
+            
             // 显示成功消息和生成的短链接
             setGeneratedLink(response.data.shortUrl);
             setQrValue(response.data.shortUrl);
@@ -268,34 +266,6 @@ const HomePage: React.FC = () => {
         <div className="container mx-auto p-8">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-3xl font-bold">FastGPT 营销链接生成器</h1>
-                {authLoading ? (
-                    <div className="text-gray-400 text-sm">加载中...</div>
-                ) : user ? (
-                    <div className="flex items-center space-x-4">
-                        <span className="text-gray-600">
-                            欢迎，<span className="font-medium">{user.username}</span>
-                        </span>
-                        <a 
-                            href="/dashboard" 
-                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm transition-colors"
-                        >
-                            仪表盘
-                        </a>
-                        <a 
-                            href="/api-test" 
-                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm transition-colors ml-2"
-                        >
-                            API测试
-                        </a>
-                    </div>
-                ) : (
-                    <a 
-                        href="/login" 
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                    >
-                        登录
-                    </a>
-                )}
             </div>
             {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
             <div className="mb-4">

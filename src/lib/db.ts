@@ -16,7 +16,7 @@ const getDbConfig = () => {
   }
   else {
     console.log('使用单独的配置参数连接数据库');
-    return {uri: 'mysql://root:zpn84sx9@dbconn.sealosbja.site:42606/datafollow'}
+    return {uri: 'mysql://root:bqsqcpp9@dbconn.sealoshzh.site:35853/datafollow'}
   }
 
   // 否则使用单独的配置参数
@@ -243,4 +243,4 @@ export async function query(sql: string, params: any[] = []) {
 }
 
 export { pool, connectAndInit };
-export default pool; 
+export default pool;

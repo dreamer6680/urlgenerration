@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
-import { withAuth } from '../../../lib/apiAuth';
 import { NextRequest } from 'next/server';
 
 // 处理POST请求 - 创建新项目
 export const POST = async (req: NextRequest) => {
-  return withAuth(req, async (req: NextRequest, user: { username: string }) => {
     try {
       const { projectCode, projectDescription, workflow } = await req.json();
 
@@ -97,28 +95,25 @@ export const POST = async (req: NextRequest) => {
         { status: 500 }
       );
     }
-  });
 };
 
 // 处理GET请求 - 获取所有项目
 export const GET = async (req: NextRequest) => {
-  return withAuth(req, async (req: NextRequest, user: { username: string }) => {
-    try {
-      const projects = await query(
-        'SELECT id, project_code, url FROM workflow ORDER BY id DESC',
-        []
-      ) as any[];
+  try {
+    const projects = await query(
+      'SELECT id, project_code, url FROM workflow ORDER BY id DESC',
+      []
+    ) as any[];
 
-      return NextResponse.json({
-        success: true,
-        projects,
-      });
-    } catch (error: any) {
-      console.error('获取项目列表失败:', error);
-      return NextResponse.json(
-        { success: false, message: `获取项目列表时出错: ${error.message}` },
-        { status: 500 }
-      );
-    }
-  });
-}; 
+    return NextResponse.json({
+      success: true,
+      projects,
+    });
+  } catch (error: any) {
+    console.error('获取项目列表失败:', error);
+    return NextResponse.json(
+      { success: false, message: `获取项目列表时出错: ${error.message}` },
+      { status: 500 }
+    );
+  }
+};
