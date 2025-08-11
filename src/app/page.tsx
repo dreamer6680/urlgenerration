@@ -169,7 +169,6 @@ const HomePage: React.FC = () => {
                 sourceType,
                 platform,
                 projectCode: selectedProject,
-                description,
                 workflow_url: project.url
             });
             
@@ -178,6 +177,7 @@ const HomePage: React.FC = () => {
             setQrValue(response.data.shortUrl);
             setSuccessMessage('短链接生成成功!');
             setUpdatelist(true);
+            
         } catch (error) {
             console.error('生成链接失败:', error);
             setError('生成链接失败，请稍后重试');

@@ -66,20 +66,44 @@ export async function POST(request: NextRequest) {
         const [maxIdResult] = await query('SELECT MAX(id) as max_id FROM link_info') as any[];
         const nextId = maxIdResult.max_id ? maxIdResult.max_id + 1 : Math.floor(Math.random() * 100000);
 
-        const shortUrl = `${currentDomain}/${nextId}`;
+        const shortChainId = Math.floor(Math.random() * 100000);
+
+        try {
+            const [existingLink] = await query(`SELECT * FROM link_info WHERE source_type = ? AND platform = ? AND project_code = ?`, [sourceType, platform, projectCode]) as any[];
+            if (existingLink) {
+                return NextResponse.json(
+                    { error: '短链已存在' },
+                    { status: 400 }
+                );
+            }
+        } catch (error) {
+            console.error('数据库查询出错', error);
+            return NextResponse.json(
+                { error: '服务器错误' },
+                { status: 500 }
+            );
+        }
+
 
         // 创建数据库记录 - 使用link_info表并明确指定created_at和description
         await query(
             `INSERT INTO link_info (
                 source_type, platform, project_code, short_url, long_url, created_at
             ) VALUES (?, ?, ?, ?, ?, ?);`,
-            [sourceType, platform, projectCode, shortUrl, longUrl, currentTime]
+            [sourceType, platform, projectCode, shortChainId, longUrl, currentTime]
         );
 
         // 获取最后插入的记录ID
         const [result] = await query('SELECT LAST_INSERT_ID() as id') as any[];
         const insertId = result.id;
 
+        const shortUrl = `${currentDomain}/${insertId}`;
+        
+        // 更新记录的短链接字段
+        await query(
+            `UPDATE link_info SET short_url = ? WHERE id = ?`,
+            [shortUrl, insertId]
+        );
 
         // 返回完整的新记录对象
         return NextResponse.json({

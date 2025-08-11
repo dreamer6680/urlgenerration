@@ -24,16 +24,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // 检查路径格式 /{platform}/{project_code}
+  console.log(`[中间件] 处理路径: ${path}`);
   const segments = path.split('/').filter(Boolean);
-  if (segments.length === 2) {
-    const platform = segments[0];
-    const projectCode = segments[1];
+  if (Number.isInteger(parseInt(segments[0]))) {
+    const shortChainId = segments[0];
     
-    console.log(`[中间件] 检测到短链格式: ${platform}/${projectCode}`);
+    console.log(`[中间件] 检测到短链格式: ${shortChainId}`);
     
     // 构建到API路由的URL
-    const redirectApiUrl = new URL(`/api/redirect?platform=${encodeURIComponent(platform)}&projectCode=${encodeURIComponent(projectCode)}`, request.url);
+    const redirectApiUrl = new URL(`/api/redirect?shortChainId=${encodeURIComponent(shortChainId)}`, request.url);
     console.log(`[中间件] 重定向到API路由: ${redirectApiUrl.toString()}`);
     
     // 重定向到API路由处理
