@@ -334,7 +334,7 @@ const HomePage: React.FC = () => {
                             <option value="">暂无项目数据</option>
                         ) : (
                             <>
-                                <option value="">请选择项目代号</option>
+                                <option value="">请选择工作流</option>
                                 {projects.map(project => (
                                     <option key={project.id} value={project.project_code}>
                                         {project.project_code}

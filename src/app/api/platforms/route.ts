@@ -5,13 +5,23 @@ import { NextRequest } from 'next/server';
 export async function GET(req: NextRequest) {
   try {
     // 查询平台列表
-    const platforms = await query('SELECT * FROM platform ORDER BY id ASC') as any[];
+    const platformsRaw = await query('SELECT * FROM platform ORDER BY id ASC') as any[];
     
-    return NextResponse.json(platforms);
+    // 转换字段名以匹配FastGPTWorkflow的期望格式
+    const platforms = platformsRaw.map(item => ({
+      id: item.id,
+      name: item.platform,
+      abbreviation: item.abbreviation
+    }));
+    
+    return NextResponse.json({
+      success: true,
+      platforms: platforms
+    });
   } catch (error) {
     console.error('获取平台列表失败:', error);
     return NextResponse.json(
-      { error: '获取平台列表失败' },
+      { success: false, error: '获取平台列表失败' },
       { status: 500 }
     );
   }

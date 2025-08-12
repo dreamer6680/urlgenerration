@@ -10,7 +10,7 @@ export const POST = async (req: NextRequest) => {
       // 验证数据
       if (!projectCode) {
         return NextResponse.json(
-          { success: false, message: '项目代码是必需的' },
+          { success: false, message: '工作流名称是必需的' },
           { status: 400 }
         );
       }
@@ -23,7 +23,7 @@ export const POST = async (req: NextRequest) => {
 
       if (existingProjects.length > 0) {
         return NextResponse.json(
-          { success: false, message: '该项目代码已存在' },
+          { success: false, message: '该工作流名称已存在' },
           { status: 400 }
         );
       }

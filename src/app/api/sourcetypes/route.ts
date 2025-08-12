@@ -5,13 +5,23 @@ import { NextRequest } from 'next/server';
 export async function GET(req: NextRequest) {
   try {
     // 查询来源类型列表
-    const sourceTypes = await query('SELECT * FROM sourcetype ORDER BY id ASC') as any[];
+    const sourceTypesRaw = await query('SELECT * FROM sourcetype ORDER BY id ASC') as any[];
     
-    return NextResponse.json(sourceTypes);
+    // 转换字段名以匹配FastGPTWorkflow的期望格式
+    const sourceTypes = sourceTypesRaw.map(item => ({
+      id: item.id,
+      name: item.sourcetype,
+      name_en: item.en
+    }));
+    
+    return NextResponse.json({
+      success: true,
+      sourceTypes: sourceTypes
+    });
   } catch (error) {
     console.error('获取来源类型列表失败:', error);
     return NextResponse.json(
-      { error: '获取来源类型列表失败' },
+      { success: false, error: '获取来源类型列表失败' },
       { status: 500 }
     );
   }

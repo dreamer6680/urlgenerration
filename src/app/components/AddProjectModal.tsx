@@ -72,7 +72,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md pointer-events-auto">
-        <h3 className="text-xl font-bold mb-4">添加新项目</h3>
+        <h3 className="text-xl font-bold mb-4">添加新工作流</h3>
         
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -82,7 +82,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-1">项目代码 <span className="text-red-500">*</span></label>
+            <label className="block mb-1">工作流名称 <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={projectCode}
@@ -94,7 +94,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1">项目描述</label>
+            <label className="block mb-1">工作流描述</label>
             <input
               type="text"
               value={projectDescription}
@@ -138,4 +138,4 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
 
     
   );
-} 
+}

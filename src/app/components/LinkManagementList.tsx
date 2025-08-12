@@ -169,7 +169,7 @@ const LinkManagementList: React.FC<LinkManagementListProps> = ({ updatalist }) =
                 return false;
             }
             
-            // 筛选项目代号
+            // 筛选工作流详情
             if (filters.projectCode && !link.projectCode.toLowerCase().includes(filters.projectCode.toLowerCase())) {
                 return false;
             }
@@ -217,7 +217,7 @@ const LinkManagementList: React.FC<LinkManagementListProps> = ({ updatalist }) =
                         <span className="font-medium">已筛选: </span>
                         {filters.sourceType && <span className="mr-2">来源类型: {filters.sourceType}</span>}
                         {filters.platform && <span className="mr-2">发布平台: {filters.platform}</span>}
-                        {filters.projectCode && <span className="mr-2">项目代号包含: {filters.projectCode}</span>}
+                        {filters.projectCode && <span className="mr-2">工作流详情包含: {filters.projectCode}</span>}
                         {filters.description && <span className="mr-2">描述包含: {filters.description}</span>}
                     </div>
                     <button 
@@ -336,13 +336,13 @@ const LinkManagementList: React.FC<LinkManagementListProps> = ({ updatalist }) =
                                         onClick={() => setShowProjectCodeFilter(!showProjectCodeFilter)}
                                         className="cursor-pointer flex items-center justify-center"
                                     >
-                                        项目代号
+                                        工作流详情
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
                                     
-                                    {/* 项目代号筛选输入框 */}
+                                    {/* 工作流详情筛选输入框 */}
                                     {showProjectCodeFilter && (
                                         <div 
                                             ref={projectCodeFilterRef}
@@ -364,7 +364,7 @@ const LinkManagementList: React.FC<LinkManagementListProps> = ({ updatalist }) =
                                                     // 在中文输入完成后应用筛选
                                                     handleFilterChange('projectCode', (e.target as HTMLInputElement).value || null);
                                                 }}
-                                                placeholder="搜索项目代号..."
+                                                placeholder="搜索工作流详情..."
                                                 className="border border-gray-300 p-2 w-full rounded-md mb-2"
                                                 autoFocus
                                             />
@@ -465,4 +465,4 @@ const LinkManagementList: React.FC<LinkManagementListProps> = ({ updatalist }) =
     );
 };
 
-export default LinkManagementList; 
+export default LinkManagementList;

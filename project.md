@@ -10,15 +10,15 @@
 ## 核心功能分析
 
 ### 1. 短链接生成系统
-- **核心逻辑**: 根据来源类型、发布平台和项目代码生成带UTM参数的FastGPT登录链接
+- **核心逻辑**: 根据来源类型、发布平台和项目名称生成带UTM参数的FastGPT登录链接
 - **URL格式**: `https://cloud.fastgpt.cn/login?lastRoute=%2Fapp%2Flist&utm_source={sourceTypeEn}&utm_medium={abbreviation}&utm_content={projectCode}&utm_workflow={workflow_url}`
 - **短链格式**: 使用数据库ID作为短链标识符，通过中间件重定向到长链接
 - **重定向机制**: 通过Next.js中间件捕获数字格式的路径，重定向到API处理
 
 ### 2. 项目管理系统
-- **项目创建**: 支持创建项目，包含项目代码、描述和可选的workflow JSON配置
+- **项目创建**: 支持创建项目，包含项目名称、描述和可选的workflow JSON配置
 - **项目选择**: 下拉选择已创建的项目进行链接生成
-- **数据验证**: 确保项目代码唯一性，workflow为有效JSON格式
+- **数据验证**: 确保项目名称唯一性，workflow为有效JSON格式
 
 ### 3. 平台和来源类型管理
 - **平台管理**: 动态添加发布平台（如微信、微博等），包含平台名称和缩写
@@ -27,7 +27,7 @@
 
 ### 4. 链接管理和统计
 - **链接列表**: 显示所有生成的链接，包含创建时间、平台、项目等信息
-- **筛选功能**: 支持按来源类型、平台、项目代码等条件筛选链接
+- **筛选功能**: 支持按来源类型、平台、项目名称等条件筛选链接
 - **导出功能**: 支持将链接数据导出为CSV格式
 
 ### 5. 用户认证系统
@@ -119,7 +119,7 @@ CREATE TABLE sourcetype (
 ```sql
 CREATE TABLE workflow (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  project_code VARCHAR(50) NOT NULL UNIQUE, # 项目代码
+  project_code VARCHAR(50) NOT NULL UNIQUE, # 项目名称
   description VARCHAR(100),                  # 项目描述
   url VARCHAR(255) UNIQUE,                   # workflow URL
   workflow JSON                              # workflow配置
